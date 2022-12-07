@@ -16,7 +16,7 @@ mtx = np.array([[1.15694047e+03, 0.00000000e+00, 6.65948821e+02],
 dist = np.array([[-2.37638058e-01, -8.54041696e-02, -7.90999653e-04,
         -1.15882218e-04,  1.05725981e-01]])
 
-if True:
+if False:
     print("calibrating Camera", end="") # Dynamic progress bar
     st = time.time()
 
@@ -61,144 +61,170 @@ if True:
 ### --- Start Image Processing --- 
 
 
+## video capture was implemented using code from https://www.geeksforgeeks.org/python-play-a-video-using-opencv/
+cap = cv.VideoCapture('img/Udacity/project_video.mp4')
+
+frame_count = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+current_frame = 0
+
+# Check if camera opened successfully
+if (cap.isOpened()== False):
+    print("Error opening video file")
+
+# Read until video is completed
+while(cap.isOpened()):
+
+    total_start = time.time()
+
+    # Load video frame
+    ret, img1 = cap.read()
+
+    if ret == True:
+        current_frame += 1
+        
+        ### --- Transform Image ---
 
 
-total_start = time.time()
+        # Define width and Height of original image
+        h,  w = img1.shape[:2]
 
-print("Loading Image...")
+        # Undistort image using predefined Camera Matrix
+        img1 = cv.undistort(img1, mtx, dist, None, mtx)
 
-# Load example image
-img1 = cv.imread('img/Udacity/image005.jpg', -1)
+        # Define perspektive transformation corners
+        src = np.float32(((560, 450), (720, 450), (200, 700), (1200, 700)))
+        dst = np.float32(((0, 0), (w, 0), (0, h), (w, h)))
 
+        # Apply perspective transformation
+        M = cv.getPerspectiveTransform(src,dst)
+        img1_warp = cv.warpPerspective(img1,M,(img1.shape[1], img1.shape[0]))
 
-### --- Tranform Image ---
+        # Apply filters to find lines
+        black_white = np.where(cv.cvtColor(img1_warp, cv.COLOR_BGR2GRAY) > 180, np.uint8(255), np.uint8(0))
 
+        # define width and height of transformed image
+        w = len(black_white[1])
+        h = len(black_white)
 
-print("Transforming image...")
+        # Split image and filter for single points
+        left_half = black_white[:,0:int(w/2)]
+        right_half = black_white[:,int(w/2):w]
 
-# Define width and Height of original image
-h,  w = img1.shape[:2]
-
-# Undistort image using predefined Camera Matrix
-img1 = cv.undistort(img1, mtx, dist, None, mtx)
-
-# Define perspektive transformation corners
-src = np.float32(((560, 450), (720, 450), (200, 700), (1200, 700)))
-dst = np.float32(((0, 0), (w, 0), (0, h), (w, h)))
-
-# Apply perspective transformation
-M = cv.getPerspectiveTransform(src,dst)
-img1_warp = cv.warpPerspective(img1,M,(img1.shape[1], img1.shape[0]))
-
-# Apply filters to find lines
-black_white = np.where(cv.cvtColor(img1_warp, cv.COLOR_BGR2GRAY) > 180, np.uint8(255), np.uint8(0))
-
-# define width and height of transformed image
-w = len(black_white[1])
-h = len(black_white)
-
-# Split image and filter for single points
-left_half = black_white[:,0:int(w/2)]
-right_half = black_white[:,int(w/2):w]
-
-kernel = np.array([[1,0,-1],[1,0,-1],[1,0,-1]],np.float32)
-left_half = cv.filter2D(left_half,-1,kernel)
-kernel = np.array([[-1,0,1],[-1,0,1],[-1,0,1]],np.float32)
-right_half = cv.filter2D(right_half,-1,kernel)
+        kernel = np.array([[1,0,-1],[1,0,-1],[1,0,-1]],np.float32)
+        left_half = cv.filter2D(left_half,-1,kernel)
+        kernel = np.array([[-1,0,1],[-1,0,1],[-1,0,1]],np.float32)
+        right_half = cv.filter2D(right_half,-1,kernel)
 
 
-### --- Get points of pixels ---
+        ### --- Get points of pixels ---
 
 
-print("getting pixels... ")
-
-# Get Array of point coordinates from image
-
-left_y, left_x = np.where(left_half == np.uint32(255))
-right_y, right_x = np.where(right_half == np.uint32(255))
+        # Get Array of point coordinates from image
 
 
-### --- get polynomial functions ---
+        left_y, left_x = np.where(left_half == np.uint32(255))
+        right_y, right_x = np.where(right_half == np.uint32(255))
 
 
-print("determining functions... ")
-# Determine Polynomial Function representing the white pixel for each half
-
-def get_poly(x_n, y_n):
-    """
-    get_poly Determine the second degree polynomial function representing the points defined in the input arrays
-    Uses np.polyfit
-
-    Args:
-        x_n (Array): X values of points 
-        y_n (Array): Y values of points
-
-    Returns:
-        (Array, Array): Arrays containing key pints defining a second degree polynomial Function
-    """
-    w = np.polyfit(y_n, x_n, 2)
-
-    xn = np.arange(0, h, 1)
-    yn1 = np.poly1d(w)(xn)
-
-    return (xn, yn1)
-
-# Get representative Polynomial funciton for each half 
-left_yn, left_xn = get_poly(left_x, left_y)
-right_yn, right_xn = get_poly(right_x, right_y)
-
-# Shift right curve to the right to display it correctly
-right_xn += np.uint32(w/2) 
+        ### --- get polynomial functions ---
 
 
-### --- Draw shapes on polygon and transform back to original ---
+        # Determine Polynomial Function representing the white pixel for each half
+
+        def get_poly(x_n, y_n):
+            """
+            get_poly Determine the second degree polynomial function representing the points defined in the input arrays
+            Uses np.polyfit
+
+            Args:
+                x_n (Array): X values of points 
+                y_n (Array): Y values of points
+
+            Returns:
+                (Array, Array): Arrays containing key pints defining a second degree polynomial Function
+            
+            Raises: 
+                ValueError: If input Array is empty
+            """
+            if len(x_n) == 0:
+                raise ValueError
+
+            w = np.polyfit(y_n, x_n, 2)
+
+            xn = np.arange(0, h, 1)
+            yn1 = np.poly1d(w)(xn)
+
+            return (xn, yn1)
+
+        original_overlayed = img1
+        try:
+            # Get representative Polynomial funciton for each half 
+            left_yn, left_xn = get_poly(left_x, left_y)
+            right_yn, right_xn = get_poly(right_x, right_y)
+        
+
+            # Shift right curve to the right to display it correctly
+            right_xn += np.uint32(w/2) 
 
 
-print("Drawing shapes on original Image...")
-
-# init black image for polygon
-warp_poly = np.zeros((h, w, 3), np.uint8)
-#init black image for lines
-warp_lines = np.zeros((h, w, 3), np.uint8)
-alpha = 0.25 # opacity of overlayed polygon
-
-# Create Stack out of points for each line
-left_curve_stack = np.stack((left_xn, left_yn), axis=-1)
-right_curve_stack = np.stack((right_xn, right_yn), axis=-1)
-
-# create array containing both lines
-pts = np.array([left_curve_stack, right_curve_stack[::-1]], np.int32)
-pts = pts.reshape((-1,1,2))
-
-# fill space between lines with (green) polygon
-cv.fillPoly(warp_poly, [pts], (0,255,0))
-
-# Draw both lines in image (blue)
-cv.polylines(warp_lines, pts, isClosed = True, color = (255, 0, 0), thickness = 60)
-
-# transform poylgon back to original proportions
-M = cv.getPerspectiveTransform(dst,src)
-transform_back = cv.warpPerspective(warp_poly,M,(w, h))
-
-# overlay polygon with limited opacity onto road
-original_overlayed = img1
-original_overlayed = cv.addWeighted(transform_back, alpha, original_overlayed, 1-alpha, 1)
-original_overlayed = np.where(transform_back == 0, img1, original_overlayed)
-
-# transform lines back to original proportions
-transform_back = cv.warpPerspective(warp_lines,M,(w, h))
-original_overlayed[:,:,0] = np.where(transform_back[:,:,0] == 255, 255, original_overlayed[:,:,0])
-original_overlayed[:,:,1] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,1])
-original_overlayed[:,:,2] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,2])
+            ### --- Draw shapes on polygon and transform back to original ---
 
 
-### --- Write final image to file ---
+            # init black image for polygon
+            warp_poly = np.zeros((h, w, 3), np.uint8)
+            #init black image for lines
+            warp_lines = np.zeros((h, w, 3), np.uint8)
+            alpha = 0.25 # opacity of overlayed polygon
 
-filename = "./result_img.jpg"
-print("writing result to: " + cwd + "\\" + filename )
+            # Create Stack out of points for each line
+            left_curve_stack = np.stack((left_xn, left_yn), axis=-1)
+            right_curve_stack = np.stack((right_xn, right_yn), axis=-1)
 
-cv.imwrite(filename, original_overlayed)
+            # create array containing both lines
+            pts = np.array([left_curve_stack, right_curve_stack[::-1]], np.int32)
+            pts = pts.reshape((-1,1,2))
 
-total_end = time.time()
-mtime = round(total_end - total_start, 2)
-print("Total elapsed time: ", mtime, "s")
+            # fill space between lines with (green) polygon
+            cv.fillPoly(warp_poly, [pts], (0,255,0))
+
+            # Draw both lines in image (blue)
+            cv.polylines(warp_lines, pts, isClosed = True, color = (255, 0, 0), thickness = 60)
+
+            # transform poylgon back to original proportions
+            M = cv.getPerspectiveTransform(dst,src)
+            transform_back = cv.warpPerspective(warp_poly,M,(w, h))
+
+            # overlay polygon with limited opacity onto road
+            original_overlayed = cv.addWeighted(transform_back, alpha, original_overlayed, 1-alpha, 1)
+            original_overlayed = np.where(transform_back == 0, img1, original_overlayed)
+
+            # transform lines back to original proportions
+            transform_back = cv.warpPerspective(warp_lines,M,(w, h))
+            original_overlayed[:,:,0] = np.where(transform_back[:,:,0] == 255, 255, original_overlayed[:,:,0])
+            original_overlayed[:,:,1] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,1])
+            original_overlayed[:,:,2] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,2])
+
+        except(ValueError):
+            print("No markings found! ", end="")
+
+        finally:
+            ### --- Write final image to file ---
+
+            # filename = "./result_img.jpg"
+            # print("writing result to: " + cwd + "\\" + filename )
+            # cv.imwrite(filename, original_overlayed)
+            cv.imshow('Frame', original_overlayed)
+            if cv.waitKey(1) & 0xFF == ord('q'):
+                print("exiting video playback...")
+                break
+
+            total_end = time.time()
+            mtime = round(total_end - total_start, 2)
+            print(current_frame, "/", frame_count, ": ", mtime, "s")
+    
+    else:
+        break
+
+cap.release()
+
+cv.destroyAllWindows()
