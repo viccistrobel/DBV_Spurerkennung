@@ -5,6 +5,9 @@ import os
 import glob
 import time
 
+### --- Definition of global variables ---
+font = cv.FONT_HERSHEY_SIMPLEX
+
 cwd = os.path.dirname(os.path.realpath(__file__)) # get correct cwd
 os.chdir(cwd)
 
@@ -16,7 +19,9 @@ mtx = np.array([[1.15694047e+03, 0.00000000e+00, 6.65948821e+02],
 dist = np.array([[-2.37638058e-01, -8.54041696e-02, -7.90999653e-04,
         -1.15882218e-04,  1.05725981e-01]])
 
-if False:
+### --- Camera Calibration ---
+
+if True:
     print("calibrating Camera", end="") # Dynamic progress bar
     st = time.time()
 
@@ -166,6 +171,11 @@ while(cap.isOpened()):
             # Shift right curve to the right to display it correctly
             right_xn += np.uint32(w/2) 
 
+            calc_end = time.time()
+            mtime = round(calc_end - total_start, 3)
+            print("Frame: ", current_frame, "/", frame_count, ": ", end="")
+            print("Calc Time: ", mtime*1000, "ms ", end="")
+
 
             ### --- Draw shapes on polygon and transform back to original ---
 
@@ -210,17 +220,21 @@ while(cap.isOpened()):
         finally:
             ### --- Write final image to file ---
 
-            # filename = "./result_img.jpg"
-            # print("writing result to: " + cwd + "\\" + filename )
-            # cv.imwrite(filename, original_overlayed)
+            total_end = time.time()
+            mtime = round(total_end - total_start, 3)
+            # print("Total time: ", mtime*1000, "ms")
+
+            fps = str(round(1 / mtime))
+            cv.putText(original_overlayed, 'FPS: ' + fps, (10,h-10), font, 0.5, (255,255,255), 1)
+
             cv.imshow('Frame', original_overlayed)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 print("exiting video playback...")
                 break
 
             total_end = time.time()
-            mtime = round(total_end - total_start, 2)
-            print(current_frame, "/", frame_count, ": ", mtime, "s")
+            mtime = round(total_end - total_start, 3)
+            print("Total time: ", mtime*1000, "ms")
     
     else:
         break
