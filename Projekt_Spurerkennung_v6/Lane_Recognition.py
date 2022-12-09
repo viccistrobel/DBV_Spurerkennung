@@ -11,6 +11,11 @@ font = cv.FONT_HERSHEY_SIMPLEX
 cwd = os.path.dirname(os.path.realpath(__file__)) # get correct cwd
 os.chdir(cwd)
 
+old_left_w, old_right_w = [], []
+
+global old_frame_shapes
+alpha = 0.25 # opacity of overlayed polygon
+
 # Code was used from opencv.org/4.5.3/dc/dbb/tutorial_py_calibration.html
 
 mtx = np.array([[1.15694047e+03, 0.00000000e+00, 6.65948821e+02],
@@ -21,7 +26,7 @@ dist = np.array([[-2.37638058e-01, -8.54041696e-02, -7.90999653e-04,
 
 ### --- Camera Calibration ---
 
-if True:
+if False:
     print("calibrating Camera", end="") # Dynamic progress bar
     st = time.time()
 
@@ -159,60 +164,84 @@ while(cap.isOpened()):
             xn = np.arange(0, h, 1)
             yn1 = np.poly1d(w)(xn)
 
-            return (xn, yn1)
+            return (w, xn, yn1)
 
         original_overlayed = img1
+        
         try:
             # Get representative Polynomial funciton for each half 
-            left_yn, left_xn = get_poly(left_x, left_y)
-            right_yn, right_xn = get_poly(right_x, right_y)
-        
-
-            # Shift right curve to the right to display it correctly
-            right_xn += np.uint32(w/2) 
+            left_w, left_yn, left_xn = get_poly(left_x, left_y)
+            right_w, right_yn, right_xn = get_poly(right_x, right_y)
 
             calc_end = time.time()
             mtime = round(calc_end - total_start, 3)
             print("Frame: ", current_frame, "/", frame_count, ": ", end="")
             print("Calc Time: ", mtime*1000, "ms ", end="")
 
+            ### --- Speed up rendering by only drawing new lines if koefficients of line differ enough for last frame ---
 
-            ### --- Draw shapes on polygon and transform back to original ---
+            if len(old_left_w) == 0:
+                old_left_w = left_w
+                old_right_w = right_w
+
+            t = [0.5, 0.5, 0.05] # value for tolerance when comparing new and old curve 
+            if current_frame != 1 and not np.any(abs(old_left_w-left_w) > abs(np.multiply(t,old_left_w))) or np.any(abs(old_left_w-left_w) < 0 - abs(np.multiply(t, old_left_w))):
+                # print("reused from last frame! ", end="")
+                # print(abs(old_left_w-left_w) > abs(t*old_left_w), abs(old_left_w-left_w) < 0 - abs(t*old_left_w), end="")
+                # print(old_left_w-left_w, abs(t*old_left_w), 0 - abs(t*old_left_w))
+
+                original_overlayed = cv.addWeighted(old_poly, alpha, original_overlayed, 1-alpha, 1)
+                original_overlayed = np.where(old_poly == 0, img1, original_overlayed)
+
+                original_overlayed[:,:,0] = np.where(old_lines[:,:,0] == 255, 255, original_overlayed[:,:,0])
+                original_overlayed[:,:,1] = np.where(old_lines[:,:,0] == 255, 0, original_overlayed[:,:,1])
+                original_overlayed[:,:,2] = np.where(old_lines[:,:,0] == 255, 0, original_overlayed[:,:,2])
+            
+            else:
+                old_left_w = left_w
+                old_right_w = right_w
+                
+                # Shift right curve to the right to display it correctly
+                right_xn += np.uint32(w/2) 
+
+                ### --- Draw shapes on polygon and transform back to original ---
 
 
-            # init black image for polygon
-            warp_poly = np.zeros((h, w, 3), np.uint8)
-            #init black image for lines
-            warp_lines = np.zeros((h, w, 3), np.uint8)
-            alpha = 0.25 # opacity of overlayed polygon
+                # init black image for polygon
+                warp_poly = np.zeros((h, w, 3), np.uint8)
+                #init black image for lines
+                warp_lines = np.zeros((h, w, 3), np.uint8)
 
-            # Create Stack out of points for each line
-            left_curve_stack = np.stack((left_xn, left_yn), axis=-1)
-            right_curve_stack = np.stack((right_xn, right_yn), axis=-1)
+                # Create Stack out of points for each line
+                left_curve_stack = np.stack((left_xn, left_yn), axis=-1)
+                right_curve_stack = np.stack((right_xn, right_yn), axis=-1)
 
-            # create array containing both lines
-            pts = np.array([left_curve_stack, right_curve_stack[::-1]], np.int32)
-            pts = pts.reshape((-1,1,2))
+                # create array containing both lines
+                pts = np.array([left_curve_stack, right_curve_stack[::-1]], np.int32)
+                pts = pts.reshape((-1,1,2))
 
-            # fill space between lines with (green) polygon
-            cv.fillPoly(warp_poly, [pts], (0,255,0))
+                # fill space between lines with (green) polygon
+                cv.fillPoly(warp_poly, [pts], (0,255,0))
 
-            # Draw both lines in image (blue)
-            cv.polylines(warp_lines, pts, isClosed = True, color = (255, 0, 0), thickness = 60)
+                # Draw both lines in image (blue)
+                cv.polylines(warp_lines, pts, isClosed = True, color = (255, 0, 0), thickness = 60)
 
-            # transform poylgon back to original proportions
-            M = cv.getPerspectiveTransform(dst,src)
-            transform_back = cv.warpPerspective(warp_poly,M,(w, h))
+                # transform poylgon back to original proportions
+                M = cv.getPerspectiveTransform(dst,src)
+                transform_back = cv.warpPerspective(warp_poly,M,(w, h))
+                old_poly = transform_back
 
-            # overlay polygon with limited opacity onto road
-            original_overlayed = cv.addWeighted(transform_back, alpha, original_overlayed, 1-alpha, 1)
-            original_overlayed = np.where(transform_back == 0, img1, original_overlayed)
+                # overlay polygon with limited opacity onto road
+                original_overlayed = cv.addWeighted(transform_back, alpha, original_overlayed, 1-alpha, 1)
+                original_overlayed = np.where(transform_back == 0, img1, original_overlayed)
 
-            # transform lines back to original proportions
-            transform_back = cv.warpPerspective(warp_lines,M,(w, h))
-            original_overlayed[:,:,0] = np.where(transform_back[:,:,0] == 255, 255, original_overlayed[:,:,0])
-            original_overlayed[:,:,1] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,1])
-            original_overlayed[:,:,2] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,2])
+                # transform lines back to original proportions
+                transform_back = cv.warpPerspective(warp_lines,M,(w, h))
+                old_lines = transform_back
+
+                original_overlayed[:,:,0] = np.where(transform_back[:,:,0] == 255, 255, original_overlayed[:,:,0])
+                original_overlayed[:,:,1] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,1])
+                original_overlayed[:,:,2] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,2])
 
         except(ValueError):
             print("No markings found! ", end="")
