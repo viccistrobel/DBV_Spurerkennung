@@ -1,5 +1,6 @@
 import cv2 as cv
 from matplotlib import pyplot as plt
+from helpers import filter_yellow_and_white_lines
 import numpy as np
 import os
 import glob
@@ -110,15 +111,15 @@ while(cap.isOpened()):
         img1_warp = cv.warpPerspective(img1,M,(img1.shape[1], img1.shape[0]))
 
         # Apply filters to find lines
-        black_white = np.where(cv.cvtColor(img1_warp, cv.COLOR_BGR2GRAY) > 180, np.uint8(255), np.uint8(0))
+        filtered_lines = filter_yellow_and_white_lines(img1_warp)
 
         # define width and height of transformed image
-        w = len(black_white[1])
-        h = len(black_white)
+        w = len(filtered_lines[1])
+        h = len(filtered_lines)
 
         # Split image and filter for single points
-        left_half = black_white[:,0:int(w/2)]
-        right_half = black_white[:,int(w/2):w]
+        left_half = filtered_lines[:,0:int(w/2)]
+        right_half = filtered_lines[:,int(w/2):w]
 
         kernel = np.array([[1,0,-1],[1,0,-1],[1,0,-1]],np.float32)
         left_half = cv.filter2D(left_half,-1,kernel)
