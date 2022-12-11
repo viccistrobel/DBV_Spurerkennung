@@ -1,6 +1,6 @@
 # Wilkommen beim Projekt Spuerenerkennung im Fach Digitale Bildverarbeitung!
 
-Authoren: Victoria Stobel () und Philip Pruessner (7079160) 
+Authoren: Victoria Stobel (3670137) und Philip Pruessner (7079160) 
 
 ## Dependencies
 TODO
