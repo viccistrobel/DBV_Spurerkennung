@@ -73,7 +73,8 @@ if False:
 
 
 ## video capture was implemented using code from https://www.geeksforgeeks.org/python-play-a-video-using-opencv/
-cap = cv.VideoCapture('img/Udacity/project_video.mp4')
+video_name = 'project_video.mp4'
+cap = cv.VideoCapture('img/Udacity/' + video_name)
 
 frame_count = int(cap.get(cv.CAP_PROP_FRAME_COUNT))
 current_frame = 0
@@ -81,6 +82,14 @@ current_frame = 0
 # Check if camera opened successfully
 if (cap.isOpened()== False):
     print("Error opening video file")
+    exit()
+else:
+    v_width  = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
+    v_height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
+    fps = cap.get(cv.CAP_PROP_FPS)
+    print("Video size: ", v_width, "x", v_height)
+    fourcc = cv.VideoWriter_fourcc(*'H264')
+    result_video = cv.VideoWriter('./results/result_video.mp4', fourcc, fps, (v_width, v_height))
 
 # Read until video is completed
 while(cap.isOpened()):
@@ -185,7 +194,7 @@ while(cap.isOpened()):
                 old_left_w = left_w
                 old_right_w = right_w
 
-            t = [0.5, 0.5, 0.05] # value for tolerance when comparing new and old curve 
+            t = [0.8, 0.8, 0.1] # value for tolerance when comparing new and old curve 
             if current_frame != 1 and not np.any(abs(old_left_w-left_w) > abs(np.multiply(t,old_left_w))) or np.any(abs(old_left_w-left_w) < 0 - abs(np.multiply(t, old_left_w))):
                 # print("reused from last frame! ", end="")
                 # print(abs(old_left_w-left_w) > abs(t*old_left_w), abs(old_left_w-left_w) < 0 - abs(t*old_left_w), end="")
@@ -262,6 +271,8 @@ while(cap.isOpened()):
                 print("exiting video playback...")
                 break
 
+            result_video.write(original_overlayed)
+
             total_end = time.time()
             mtime = round(total_end - total_start, 3)
             print("Total time: ", mtime*1000, "ms")
@@ -270,5 +281,6 @@ while(cap.isOpened()):
         break
 
 cap.release()
+result_video.release()
 
 cv.destroyAllWindows()
