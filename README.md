@@ -39,7 +39,7 @@ Um den Quellcode auszuführen, muss die [OpenCV Android library](https://sourcef
 - **Quellcode**: In dem [AndroidApp](AndroidApp) Ordner liegt der Quellcode für die Kotlin App. Über ein Dropdown Menü können verschiedene Beispiel-Bilder ausgewählt werden. Über den 'Filter Image' Button lässt sich das aktuell ausgewählte Bild verarbeiten.
 
 ### Vorgehen
-Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von Spuren entsprechen den Schritten im Python Projekt und können in dem File [Projekt_Spurerkennung_v2.ipynb](Projekt_Spurerkennung_v6\Projekt_Spurerkennung_v2.ipynb) eingesehen werden. Die relevanten Funktionen sind in dem [MainActivity.kt](AndroidApp/app/src/main/java/com/example/myapplication/MainActivity.kt) File implementiert.
+Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von Spuren entsprechen den Schritten im Python Projekt und können in dem File [Projekt_Spurerkennung_v2.ipynb](Projekt_Spurerkennung_v6/Projekt_Spurerkennung_v2.ipynb) eingesehen werden. Die relevanten Funktionen sind in dem [MainActivity.kt](AndroidApp/app/src/main/java/com/example/myapplication/MainActivity.kt) File implementiert.
 
 Beim Starten der App wird die Funktion `calibrateImage` aufgerufen, die mithilfe der Calibration-Bilder im Ordner [drawable](AndroidApp/app/src/main/res/drawable) die Kamera kalibriert.
 
