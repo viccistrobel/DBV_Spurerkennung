@@ -132,6 +132,7 @@ while(cap.isOpened()):
         left_half = filtered_lines[:,0:int(w/2)]
         right_half = filtered_lines[:,int(w/2):w]
 
+        # Wende Prewitt Kantenfilter an um rechte bzw. linke Kante von jeweiliger Bildhälfte zu filtern
         kernel = np.array([[1,0,-1],[1,0,-1],[1,0,-1]],np.float32)
         left_half = cv.filter2D(left_half,-1,kernel)
         kernel = np.array([[-1,0,1],[-1,0,1],[-1,0,1]],np.float32)
