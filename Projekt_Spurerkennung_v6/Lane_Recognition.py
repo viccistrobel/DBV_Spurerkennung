@@ -84,6 +84,7 @@ if (cap.isOpened()== False):
     print("Error opening video file")
     exit()
 else:
+    # define parameters and video file to write result to 
     v_width  = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
     v_height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
     fps = cap.get(cv.CAP_PROP_FPS)
@@ -94,6 +95,7 @@ else:
 # Read until video is completed
 while(cap.isOpened()):
 
+    # Start timer
     total_start = time.time()
 
     # Load video frame
@@ -140,8 +142,6 @@ while(cap.isOpened()):
 
 
         # Get Array of point coordinates from image
-
-
         left_y, left_x = np.where(left_half == np.uint32(255))
         right_y, right_x = np.where(right_half == np.uint32(255))
 
@@ -179,10 +179,12 @@ while(cap.isOpened()):
         original_overlayed = img1
         
         try:
-            # Get representative Polynomial funciton for each half 
+            # Get representative Polynomial function for each half 
+            # If no polynomial can be found, exit try block
             left_w, left_yn, left_xn = get_poly(left_x, left_y)
             right_w, right_yn, right_xn = get_poly(right_x, right_y)
 
+            # Calculate end time and print time difference
             calc_end = time.time()
             mtime = round(calc_end - total_start, 3)
             print("Frame: ", current_frame, "/", frame_count, ": ", end="")
@@ -195,11 +197,9 @@ while(cap.isOpened()):
                 old_right_w = right_w
 
             t = [0.8, 0.8, 0.1] # value for tolerance when comparing new and old curve 
-            if current_frame != 1 and not np.any(abs(old_left_w-left_w) > abs(np.multiply(t,old_left_w))) or np.any(abs(old_left_w-left_w) < 0 - abs(np.multiply(t, old_left_w))):
-                # print("reused from last frame! ", end="")
-                # print(abs(old_left_w-left_w) > abs(t*old_left_w), abs(old_left_w-left_w) < 0 - abs(t*old_left_w), end="")
-                # print(old_left_w-left_w, abs(t*old_left_w), 0 - abs(t*old_left_w))
 
+            # If difference between new and old polynomial is larger than allowed tolerance, use old drawn lines
+            if current_frame != 1 and not np.any(abs(old_left_w-left_w) > abs(np.multiply(t,old_left_w))) or np.any(abs(old_left_w-left_w) < 0 - abs(np.multiply(t, old_left_w))):
                 original_overlayed = cv.addWeighted(old_poly, alpha, original_overlayed, 1-alpha, 1)
                 original_overlayed = np.where(old_poly == 0, img1, original_overlayed)
 
@@ -208,6 +208,7 @@ while(cap.isOpened()):
                 original_overlayed[:,:,2] = np.where(old_lines[:,:,0] == 255, 0, original_overlayed[:,:,2])
             
             else:
+                # define new polynomials to be used by tolerance checking in the next frame
                 old_left_w = left_w
                 old_right_w = right_w
                 
@@ -249,6 +250,7 @@ while(cap.isOpened()):
                 transform_back = cv.warpPerspective(warp_lines,M,(w, h))
                 old_lines = transform_back
 
+                # Overlay lines on full opacity on road
                 original_overlayed[:,:,0] = np.where(transform_back[:,:,0] == 255, 255, original_overlayed[:,:,0])
                 original_overlayed[:,:,1] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,1])
                 original_overlayed[:,:,2] = np.where(transform_back[:,:,0] == 255, 0, original_overlayed[:,:,2])
@@ -263,23 +265,29 @@ while(cap.isOpened()):
             mtime = round(total_end - total_start, 3)
             # print("Total time: ", mtime*1000, "ms")
 
+            # Calculate and display fps on frame
             fps = str(round(1 / mtime))
             cv.putText(original_overlayed, 'FPS: ' + fps, (10,h-10), font, 0.5, (255,255,255), 1)
 
+            # Show image 
             cv.imshow('Frame', original_overlayed)
             if cv.waitKey(1) & 0xFF == ord('q'):
                 print("exiting video playback...")
                 break
-
+            
+            # Write frame to results video
             result_video.write(original_overlayed)
 
+            # Calculate and print total time after displaying frame 
             total_end = time.time()
             mtime = round(total_end - total_start, 3)
             print("Total time: ", mtime*1000, "ms")
     
     else:
+        # If frame can't be read (end of video), break out of loop and terminate video
         break
 
+# Clean up 
 cap.release()
 result_video.release()
 
