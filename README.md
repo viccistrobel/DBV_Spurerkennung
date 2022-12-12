@@ -1,4 +1,4 @@
-# Wilkommen beim Projekt Spuerenerkennung im Fach Digitale Bildverarbeitung!
+# Wilkommen beim Projekt Spurenerkennung im Fach Digitale Bildverarbeitung!
 
 Authoren: Victoria Stobel (3670137) und Philip Pruessner (7079160) 
 
