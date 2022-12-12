@@ -54,3 +54,11 @@ Sobald die Kalibrierung abgeschlossen wurde, kann der User ein Bild auswählen u
 ### Ergebnisse
 Die Ergebnisse für die Verarbeitung der Beispielbilder liegen in dem Ordner [AndroidApp/results](AndroidApp/results)
 
+### Hardware
+Das Video mit Kotlin wurde mit Folgender Hardware erzeugt:
+- Intel Iris Plus Graphics 645 1536 MB
+- 16 GB 2133 MHz LPDDR3
+- 1,4 GHz Quad-Core Intel Core i5
+- Android Emulator: Pixel 3a
+
+
