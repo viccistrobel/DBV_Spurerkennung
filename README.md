@@ -36,15 +36,15 @@ Um den Quellcode auszuführen, muss die [OpenCV Android library](https://sourcef
 
 ### Ausführen
 - **APK**: Die Datei `lanedetection.apk` lässt sich direkt auf dem Handy installieren und ausführen.
-- **Quellcode**: In dem `AndroidApp` Ordner liegt der Quellcode für die Kotlin App. Über ein Dropdown Menü können verschiedene Beispiel-Bilder ausgewählt werden. Über den 'Filter Image' Button lässt sich das aktuell ausgewählte Bild verarbeiten.
+- **Quellcode**: In dem [AndroidApp](AndroidApp) Ordner liegt der Quellcode für die Kotlin App. Über ein Dropdown Menü können verschiedene Beispiel-Bilder ausgewählt werden. Über den 'Filter Image' Button lässt sich das aktuell ausgewählte Bild verarbeiten.
 
 ### Vorgehen
-Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von Spuren entsprechen den Schritten im Python Projekt und können in dem File `Projekt_Spurerkennung_v6\Projekt_Spurerkennung_v2.ipynb` eingesehen werden. Die relevanten Funktionen sind in dem `AndroidApp/app/src/main/java/com/example/myapplication/MainActivity.kt` File implementiert.
+Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von Spuren entsprechen den Schritten im Python Projekt und können in dem File [Projekt_Spurerkennung_v2.ipynb](Projekt_Spurerkennung_v6\Projekt_Spurerkennung_v2.ipynb) eingesehen werden. Die relevanten Funktionen sind in dem [MainActivity.kt](AndroidApp/app/src/main/java/com/example/myapplication/MainActivity.kt) File implementiert.
 
-Beim Starten der App wird die Funktion `calibrateImage` aufgerufen, die mithilfe der Calibration-Bilder im Ordner `AndroidApp/app/src/main/res/drawable` die Kamera kalibriert.
+Beim Starten der App wird die Funktion `calibrateImage` aufgerufen, die mithilfe der Calibration-Bilder im Ordner [drawable](AndroidApp/app/src/main/res/drawable) die Kamera kalibriert.
 
 Sobald die Kalibrierung abgeschlossen wurde, kann der User ein Bild auswählen und die Spur filtern. Hierbei wird die Funktion `runImagePipeline` aufgerufen, die die Schritte für die Verarbeitung eines einzelnen Bildes (siehe oben) ausführt.
 
 ### Ergebnisse
-Die Ergebnisse für die Verarbeitung der Beispielbilder liegen in dem Ordner `AndroidApp/results`
+Die Ergebnisse für die Verarbeitung der Beispielbilder liegen in dem Ordner [AndroidApp/results](AndroidApp/results)
 
