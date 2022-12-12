@@ -146,6 +146,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
         val processedBitmap = Bitmap.createBitmap(originalOverlayed!!.cols(), originalOverlayed!!.rows(), Bitmap.Config.ARGB_8888)
         Utils.matToBitmap(originalOverlayed, processedBitmap)
         img2!!.setImageBitmap(processedBitmap)
+
+        originalOverlayed.release()
+        filteredImage?.release()
+        calib.release()
     }
 
     /**
@@ -268,6 +272,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
         // overlay polygon with limited opacity onto road and store it as mat object
         val originalOverlayed = Mat()
         Core.addWeighted( image, 1.0, transformedBack, 0.5, 0.0, originalOverlayed);
+        transformedBack.release()
+        overlay.release()
 
         return originalOverlayed
     }
@@ -295,11 +301,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
         val upperYellow = Scalar(46.0, 255.0, 255.0)
         val yellowMask = Mat()
         Core.inRange(hls, lowerYellow, upperYellow, yellowMask)
+        hls.release()
 
         // combine yellow and white filter
         val combined = Mat()
         Core.bitwise_or(whiteMask, yellowMask, combined)
-
+        whiteMask.release()
+        yellowMask.release()
         return combined
     }
 
