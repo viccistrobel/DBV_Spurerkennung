@@ -27,6 +27,12 @@ Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von 
 ### Ergebnisse
 Die Ergebnisse für die Verarbeitung der Beispielbilder und des Beispielvideos liegen in dem Ordner [Projekt_Spurerkennung_v6/results](Projekt_Spurerkennung_v6/results)
 
+### Hardware
+Das Video mit Python wurde mit Folgender Hardware erzeugt
+- AMD Ryzen 9 5900HS
+- NVIDIA GeForce RTX 3080 Laptop GPU (100W)
+- 16GB DDR4 - 3200MHz
+
 ## Kotlin App
 Kotlin App zur Spurerkennung 
 ### Dependencies
