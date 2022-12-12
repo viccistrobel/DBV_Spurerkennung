@@ -152,11 +152,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
      * function that calibrates the camera based on calibration files
      */
     private fun calibrateImage() {
-        // get calibration file
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.calibration3)
-        val mat = Mat()
-        Utils.bitmapToMat(bitmap, mat)
-
+        // get calibration images
+        val images = ArrayList<Bitmap>()
+        for (i in 1..20) {
+            val res = resources.getIdentifier("calibration${i.toString()}", "drawable", this.packageName)
+            val image = BitmapFactory.decodeResource(resources, res)
+            images.add(image)
+        }
         // termination criteria
         val criteria = TermCriteria(TermCriteria.EPS + TermCriteria.MAX_ITER, 30, 0.001)
 
@@ -174,22 +176,29 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
         val imgPoints = ArrayList<Mat>()
         val imageSize = Size()
 
-        // convert to gray image
-        val gray = Mat()
-        Imgproc.cvtColor(mat, gray, Imgproc.COLOR_RGB2GRAY)
+        images.forEach { image ->
+            val mat = Mat()
+            Utils.bitmapToMat(image, mat)
 
-        // find the chess boars corners
-        val corners = MatOfPoint2f()
-        val found = Calib3d.findChessboardCorners(gray, Size(cols.toDouble(), rows.toDouble()), corners)
+            // convert to gray image
+            val gray = Mat()
+            Imgproc.cvtColor(mat, gray, Imgproc.COLOR_RGB2GRAY)
 
-        // if found, add object points, image points (after refining them)
-        if (found) {
-            Imgproc.cornerSubPix(gray, corners, Size(11.0, 11.0), Size(-1.0, -1.0), criteria)
-            objPoints.add(objp)
-            imgPoints.add(corners)
-            imageSize.width = gray.width().toDouble()
-            imageSize.height = gray.height().toDouble()
+            // find the chess boars corners
+            val corners = MatOfPoint2f()
+            val found = Calib3d.findChessboardCorners(gray, Size(cols.toDouble(), rows.toDouble()), corners)
+
+            // if found, add object points, image points (after refining them)
+            if (found) {
+                Imgproc.cornerSubPix(gray, corners, Size(11.0, 11.0), Size(-1.0, -1.0), criteria)
+                objPoints.add(objp)
+                imgPoints.add(corners)
+                imageSize.width = gray.width().toDouble()
+                imageSize.height = gray.height().toDouble()
+            }
         }
+
+
         // set camera matrix and distribution used for calibrating and undistorting camera images
         val cameraMatrix = Mat(3, 3, CvType.CV_64FC1)
         val distCoeffs = Mat(5, 1, CvType.CV_64FC1)
@@ -198,6 +207,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener{
         Calib3d.calibrateCamera(objPoints, imgPoints, imageSize, cameraMatrix, distCoeffs, rvecs, tvecs)
         mtx = cameraMatrix
         dstCoeff = distCoeffs
+
+        Toast.makeText(this@MainActivity, "Camera Calibrated", Toast.LENGTH_SHORT).show()
     }
 
     /**
