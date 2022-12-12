@@ -20,4 +20,4 @@ In dem AndroidApp Ordner liegt der Quellcode für eine Kotlin App zur Spurerkenn
 
 Die Datei lanedetection.apk enthält eine APK für die App, die sich direkt auf dem Handy installieren lässt.
 
-Um den Quellcode auszuführen, muss die [OpenCV Android library](https://sourceforge.net/projects/opencvlibrary/files/opencv-android/) heruntergeladen und in das Projekt eingebunden werden.
+Um den Quellcode auszuführen, muss die [OpenCV Android library](https://sourceforge.net/projects/opencvlibrary/files/opencv-android/) heruntergeladen und mit dem Namen opencv in das Projekt eingebunden werden.
