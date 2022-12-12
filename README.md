@@ -10,11 +10,11 @@ Dieses Projekt wurde in Python *3.8.13* geschrieben.
 Um alle nötigen Pakete zu installieren in den Ordner `DBW_SPURENERKENNUNG` navigieren und den command `pip install -r requirements.txt` ausführen
 
 ### Ausführen
-- **Für Bilder**: im File `Projekt_Spurerkennung_v6\Projekt_Spurerkennung_v2.ipynb`letzte Lücke ausführen. In Variable `img_name` name des zu bearbeitenden Bildes eintragen
-- **Für Videos**: File `Projekt_Spurerkennung_v6\Lane_Recognition.py` ausführen. Mit **q** kann die Wiedergabe gestoppt werden.
+- **Für Bilder**: im File [Projekt_Spurerkennung_v2.ipynb](Projekt_Spurerkennung_v6/Projekt_Spurerkennung_v2.ipynb) letzte Lücke ausführen. In Variable `img_name` name des zu bearbeitenden Bildes eintragen
+- **Für Videos**: File [Lane_Recognition.py](Projekt_Spurerkennung_v6/Lane_Recognition.py) ausführen. Mit **q** kann die Wiedergabe gestoppt werden.
 
 ### Vorgehen
-Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von Spuren kann in dem File `Projekt_Spurerkennung_v6\Projekt_Spurerkennung_v2.ipynb` eingesehen werden.
+Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von Spuren kann in dem File [Projekt_Spurerkennung_v2.ipynb](Projekt_Spurerkennung_v6/Projekt_Spurerkennung_v2.ipynb) eingesehen werden.
 
 Verarbeitung eines einzelnen Bildes:
 1. Bild entzerren mithilfe einer definierten Kameramatrix und Distributiion (die mithilfe einer Kamera-Kalibrierung bestimm werden)
@@ -25,7 +25,7 @@ Verarbeitung eines einzelnen Bildes:
 6. Linien und Bereich zwischen den Linien auf Originalbild überlagern
 
 ### Ergebnisse
-Die Ergebnisse für die Verarbeitung der Beispielbilder und des Beispielvideos liegen in dem Ordner `Projekt_Spurerkennung_v6/results`
+Die Ergebnisse für die Verarbeitung der Beispielbilder und des Beispielvideos liegen in dem Ordner [Projekt_Spurerkennung_v6/results](Projekt_Spurerkennung_v6/results)
 
 ## Kotlin App
 Kotlin App zur Spurerkennung 
