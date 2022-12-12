@@ -10,7 +10,6 @@ Dieses Projekt wurde in Python *3.8.13* geschrieben.
 Um alle nötigen Pakete zu installieren in den Ordner `DBW_SPURENERKENNUNG` navigieren und den command `pip install -r requirements.txt` ausführen
 
 ### Ausführen
-
 - **Für Bilder**: im File `Projekt_Spurerkennung_v6\Projekt_Spurerkennung_v2.ipynb`letzte Lücke ausführen. In Variable `img_name` name des zu bearbeitenden Bildes eintragen
 - **Für Videos**: File `Projekt_Spurerkennung_v6\Lane_Recognition.py` ausführen. Mit **q** kann die Wiedergabe gestoppt werden.
 
@@ -25,6 +24,9 @@ Verarbeitung eines einzelnen Bildes:
 5. Für linke und rechte Linie Polynomfunktion 2. Grades bestimmen und korrekte Koordinaten der Linie bestimmen
 6. Linien und Bereich zwischen den Linien auf Originalbild überlagern
 
+### Ergebnisse
+Die Ergebnisse für die Verarbeitung der Beispielbilder und des Beispielvideos liegen in dem Ordner `Projekt_Spurerkennung_v6/results`
+
 ## Kotlin App
 Kotlin App zur Spurerkennung 
 ### Dependencies
@@ -34,7 +36,7 @@ Um den Quellcode auszuführen, muss die [OpenCV Android library](https://sourcef
 
 ### Ausführen
 - **APK**: Die Datei `lanedetection.apk` lässt sich direkt auf dem Handy installieren und ausführen.
-- **Quellcode**: In dem `AndroidApp` Ordner liegt der Quellcode für die Kotlin App. Nach dem Starten der App können über ein Dropdown Menü die verschiedenen Beispiel Bilder ausgewählt werden. Über den 'Filter Image' Button lässt sich das aktuell ausgewählte Bild verarbeiten. Sobald das Bild verarbeitet wurde, wird das verarbeitete Bild mit den erkannten Spurmarkierungen angezeigt.
+- **Quellcode**: In dem `AndroidApp` Ordner liegt der Quellcode für die Kotlin App. Über ein Dropdown Menü können verschiedene Beispiel-Bilder ausgewählt werden. Über den 'Filter Image' Button lässt sich das aktuell ausgewählte Bild verarbeiten.
 
 ### Vorgehen
 Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von Spuren entsprechen den Schritten im Python Projekt und können in dem File `Projekt_Spurerkennung_v6\Projekt_Spurerkennung_v2.ipynb` eingesehen werden. Die relevanten Funktionen sind in dem `AndroidApp/app/src/main/java/com/example/myapplication/MainActivity.kt` File implementiert.
@@ -42,4 +44,7 @@ Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von 
 Beim Starten der App wird die Funktion `calibrateImage` aufgerufen, die mithilfe der Calibration-Bilder im Ordner `AndroidApp/app/src/main/res/drawable` die Kamera kalibriert.
 
 Sobald die Kalibrierung abgeschlossen wurde, kann der User ein Bild auswählen und die Spur filtern. Hierbei wird die Funktion `runImagePipeline` aufgerufen, die die Schritte für die Verarbeitung eines einzelnen Bildes (siehe oben) ausführt.
+
+### Ergebnisse
+Die Ergebnisse für die Verarbeitung der Beispielbilder liegen in dem Ordner `AndroidApp/results`
 
