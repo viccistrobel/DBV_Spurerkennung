@@ -35,7 +35,7 @@ Die App wurde in Kotlin geschrieben.
 Um den Quellcode auszuführen, muss die [OpenCV Android library](https://sourceforge.net/projects/opencvlibrary/files/opencv-android/) heruntergeladen und mit dem Namen opencv in das Projekt eingebunden werden.
 
 ### Ausführen
-- **APK**: Die Datei `lanedetection.apk` lässt sich direkt auf dem Handy installieren und ausführen.
+- **APK**: Die Datei [lanedetection.apk](AndroidApp/lanedetection.apk) lässt sich direkt auf dem Handy installieren und ausführen.
 - **Quellcode**: In dem [AndroidApp](AndroidApp) Ordner liegt der Quellcode für die Kotlin App. Über ein Dropdown Menü können verschiedene Beispiel-Bilder ausgewählt werden. Über den 'Filter Image' Button lässt sich das aktuell ausgewählte Bild verarbeiten.
 
 ### Vorgehen
