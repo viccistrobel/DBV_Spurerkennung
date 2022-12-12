@@ -16,7 +16,7 @@ Um alle nötigen Pakete zu installieren in den Ordner `DBW_SPURENERKENNUNG` navi
 ### Vorgehen
 Das genaue Vorgehen und die einzelnen Schritte zur Erkennung und Markierung von Spuren kann in dem File [Projekt_Spurerkennung_v2.ipynb](Projekt_Spurerkennung_v6/Projekt_Spurerkennung_v2.ipynb) eingesehen werden.
 
-Verarbeitung eines einzelnen Bildes:
+Schritte zur Verarbeitung eines einzelnen Bildes:
 1. Bild entzerren mithilfe einer definierten Kameramatrix und Distributiion (die mithilfe einer Kamera-Kalibrierung bestimm werden)
 2. Bild in die Vogelperspektive transformieren
 3. Bild nach gelber und weißer Linie filtern
