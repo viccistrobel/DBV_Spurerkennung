@@ -27,7 +27,7 @@ dist = np.array([[-2.37638058e-01, -8.54041696e-02, -7.90999653e-04,
 
 ### --- Camera Calibration ---
 
-if False:
+if True:
     print("calibrating Camera", end="") # Dynamic progress bar
     st = time.time()
 
